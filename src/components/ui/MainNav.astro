@@ -1,0 +1,24 @@
+---
+const navigation = [
+  { name: 'Inicio', href: '/' },
+  { name: 'Nosotros', href: '/nosotros' }, // Le quité la barra final para que coincida con tus archivos
+  { name: 'Blog', href: '/blog' },
+  { name: 'Proceso', href: '/proceso' },
+  { name: 'Menú', href: '/menu' },
+  { name: 'Galería', href: '/galeria' },
+  { name: 'Contacto', href: '/contacto' },
+]
+---
+
+<!-- 1. Corregido el espacio en lg:flex-row -->
+<nav class="flex flex-col items-center gap-4 md:flex-row md:gap-6">
+    {navigation.map(item => (
+        // 2. Añadido los paréntesis para el retorno implícito y la directiva key
+        <a
+            href={item.href}
+            class="uppercase text-sm font-bold tracking-wider text-stone-200 hover:text-white transition-colors"
+        >
+            {item.name}
+        </a>
+    ))}
+</nav>

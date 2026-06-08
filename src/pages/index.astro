@@ -1,10 +1,14 @@
 ---
-import { Image, Picture } from 'astro:assets';
-import Layout from "../layouts/Layout.astro";
-import image from "../assets/bg_home.jpg";
+
+import Layout from "@/layouts/Layout.astro";
+import bg from '@/assets/bg_home.jpg'
 ---
 
-<Layout>
+<Layout 
+    title="Inicio"
+    bgImage={bg.src}
+  
+>
   <h1>Hola Joinova</h1>
 
   <nav>
@@ -12,11 +16,5 @@ import image from "../assets/bg_home.jpg";
     <a href="/tienda">Tienda</a>
   </nav>
 
-  <Image
-    src={image}
-    alt="Imagen de fondo"
-    formats={['avif', 'webp']}
-    width={1200}
-    loading="eager"
-  />
+  
 </Layout>
