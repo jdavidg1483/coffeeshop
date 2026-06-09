@@ -1,3 +1,29 @@
-<footer>
-    <h2>Footer</h2>
+---
+import FooterBox from "./FooterBox.astro";
+
+
+---
+<footer class="bg-coffee-900 pt-20">
+    <div class="max-w-7xl max-auto mt-10 grid grid-cols-1 lg:grid-cols-3 gap-5">
+       <FooterBox heading="Ubicacion">
+        <p>CoffeeShop, Code</p>
+        <p>Londre, UK</p>
+       </FooterBox>
+      <FooterBox heading="Reservacion">
+        <p>Whatsapp. 999999999</p>
+        <a href="whatsapp:+999999999">llamar</a>    
+      </FooterBox>
+       
+       
+         <FooterBox heading="Horario">
+           <p>Lun-Jue: 11:00 - 22:00</p>
+           <p>Vier-Sab: 09:00 - 21:00</p>
+           <p>Doming: 09:00 -20:00</p>
+         </FooterBox>
+       
+       
+    </div>
+
+    <p class="py-10 text-center text-white text-sm">
+        Todos los derechos reservados. La CoffeeShoop Code. &copy; {new Date().getFullYear()}</p>
 </footer>

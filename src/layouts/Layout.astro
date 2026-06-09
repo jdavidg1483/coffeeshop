@@ -5,10 +5,11 @@
 
     interface Props {
         title: string
+        subtitle: string
         bgImage: string
     }
 
-    const { title, bgImage } = Astro.props
+    const { title, subtitle, bgImage } = Astro.props
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -27,13 +28,18 @@
 
 <Header 
    bgImage={bgImage}
+   subtitle={subtitle}
 
 />
 
+<slot name="before-main-content" />
 
 
-<slot />
+<main class="bg-white p-20 max-w-7xl mx-auto lg:-mt-20 relative">
+    <slot />
+</main>
 
+<slot name="after-main-content" />
 
 <Footer />
 

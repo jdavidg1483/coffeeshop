@@ -4,11 +4,11 @@ import Logo from '@/assets/logo.svg'
 import MainNav from './MainNav.astro' // 👈 ¡Corregido! Importamos tu navegación
 
 interface Props {
+    subtitle: string 
     bgImage: string
-    title: string 
 }
 
-const { bgImage, title } = Astro.props
+const {  subtitle, bgImage } = Astro.props
 ---
 
 <header class="relative min-h-72 bg-cover bg-center text-white pb-12">
@@ -25,18 +25,19 @@ const { bgImage, title } = Astro.props
    <div class="absolute inset-0 bg-black/60"></div>
 
     <!-- Barra de Navegación Superior -->
-    <div class="relative max-w-7xl mx-auto py-3 flex flex-col items-center lg:flex-row lg:justify-betweenS">
-        <a href="/">
+    <div class="relative max-w-7xl mx-auto py-3">
+        <div class="flex flex-col items-center lg:flex-row lg:justify-between">
+            <a href="/">
           <!-- 👈 ¡Corregido! Forma nativa de renderizar el SVG optimizado en Astro -->
         <Image src={Logo} alt="Logo Cafetería CoffeeShop" class="w-48" />
         
         </a>
         <MainNav />
     </div>
-    
-    <!-- Título Principal centrado -->
-    <div class="max-w-7xl mx-auto px-4 mt-12 relative z-10">
-        <h1 class="text-5xl font-black text-white tracking-tight text-balance max-w-2xl">{title}</h1>
+
+    <h1 class="text-4xl font-black text-white text-center mt-6">{subtitle}</h1>
     </div>
+    
+   
    
 </header>
