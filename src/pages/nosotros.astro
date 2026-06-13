@@ -1,19 +1,34 @@
 ---
-   import Layout from "../layouts/Layout.astro"
-// 1. Hacemos la petición a tu WordPress local
-const response = await fetch('http://localhost/coffeeshop/wordpress/wp-json/wp/v2/pages')
-const pages = await response.json()
-   ---
-<Layout
-    title="Nosotrs"
+import Layout from "../layouts/Layout.astro";
 
->
-  
- </Layout>
+// 1. URL limpia y completa con _embed para la imagen
+const wpApiUrl = 'http://localhost/coffeeshop/wordpress/wp-json/wp/v2';
+const response = await fetch(`${wpApiUrl}/pages?slug=nosotros&_embed`);
+const pages = await response.json();
+const page = pages[0];
 
+if (!page) {
+  throw new Error("No se encontró la página 'nosotros'");
+}
 
-<a href="/nosotros" class="text-xl font-bold text-amber-600 hover:underline">
-  Ir a Nosotros
-</a>
+// 2. Extracción limpia de la imagen destacada
+const featuredMedia = page._embedded?.['wp:featuredmedia']?.[0];
+const imageUrl = featuredMedia?.source_url || featuredMedia?.guid?.rendered || null;
+const imageAlt = featuredMedia?.alt_text || page.title.rendered;
+---
 
-
+<Layout title={page.title.rendered}>
+  <div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-amber-600 mb-4" set:html={page.title.rendered} />
+    
+    <div class="prose max-w-none" set:html={page.content.rendered} />
+    
+    {imageUrl && (
+      <img 
+        src={imageUrl} 
+        alt={imageAlt}
+        class="mt-6 rounded-lg shadow-md max-w-full h-auto"
+      />
+    )}
+  </div>
+</Layout>
