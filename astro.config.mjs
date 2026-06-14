@@ -7,5 +7,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
-  }
+  },
+  image: {
+    // 👇 LE DAMOS PERMISO A ASTRO PARA OPTIMIZAR IMÁGENES DE TU WORDPRESS LOCAL
+    domains: ['localhost/coffeeshp/wordpress'],
+  },
 });

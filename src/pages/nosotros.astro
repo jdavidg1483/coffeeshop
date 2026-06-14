@@ -1,4 +1,5 @@
 ---
+import { Picture } from "astro:assets"
 import Layout from "../layouts/Layout.astro";
 
 // 1. URL limpia y completa con _embed para la imagen
@@ -15,20 +16,29 @@ if (!page) {
 const featuredMedia = page._embedded?.['wp:featuredmedia']?.[0];
 const imageUrl = featuredMedia?.source_url || featuredMedia?.guid?.rendered || null;
 const imageAlt = featuredMedia?.alt_text || page.title.rendered;
+
+// 3. Extracción segura de ACF (por si no viene en la API o está vacío)
+const subtitulo = page.acf?.subtitle || "Bienvenidos a nuestra cafetería"; 
 ---
 
-<Layout title={page.title.rendered}>
-  <div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-amber-600 mb-4" set:html={page.title.rendered} />
-    
-    <div class="prose max-w-none" set:html={page.content.rendered} />
+<Layout 
+  title={page.title.rendered}
+  subtitle={subtitulo}
+  bgImage={imageUrl} 
+>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
     
     {imageUrl && (
-      <img 
+      <Picture 
         src={imageUrl} 
         alt={imageAlt}
-        class="mt-6 rounded-lg shadow-md max-w-full h-auto"
+        width={800} 
+        height={600} 
+        formats={['avif', 'webp']} 
+        class="rounded-lg shadow-md max-w-full h-auto object-cover"
       />
     )}
+    
+    <div class="text-xl space-y-3 mt-10 lg:mt-0" set:html={page.content.rendered}></div>
   </div>
 </Layout>
