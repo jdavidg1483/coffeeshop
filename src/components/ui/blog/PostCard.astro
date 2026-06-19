@@ -1,0 +1,65 @@
+---
+import { Picture } from 'astro:assets'
+import type { Post } from '@/types'
+import { formatDate } from '@/helpers'
+
+interface Props {
+    post: Post
+}
+
+const { post } = Astro.props
+
+// Estrategia de respaldo (Fallback) para la imagen destacada
+const imageTarget = post.featured_images?.medium_large || post.featured_images?.medium || post.featured_images?.full;
+const categories = post.category_details || [];
+---
+
+<article class="grid grid-cols-1 lg:grid-cols-3 gap-5 py-10 border-b last-of-type:border-0 border-zinc-300 items-center">
+  <div class="lg:col-span-2 space-y-3">
+    
+   
+
+    <h3 class="text-coffee-900 font-black text-4xl uppercase hover:text-coffee-700 transition-colors pt-2">
+        <a href={`/blog/${post.id}`}>
+            {post.title.rendered}
+        </a>
+    </h3>
+
+    <p class="text-sm text-zinc-500">
+        Escrito el: <span class="text-coffee-600 font-medium">{formatDate(post.date)}</span>
+    </p>
+
+     {/* 1. CORREGIDO: Mapeo de categorías con retorno implícito usando () */}
+    {categories.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {categories.map(cat => (
+          <a 
+            href={`/categorias/${cat.slug}`} 
+            class="text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-900 px-2.5 py-1 rounded-full hover:bg-amber-200 transition-colors"
+          >
+            {cat.name}
+          </a>
+        ))}
+      </div>
+    )}
+
+    <div set:html={post.content.rendered} class="line-clamp-2 text-zinc-600 leading-relaxed pt-2"></div>
+  </div>
+
+  {/* 2. CORREGIDO: Renderizado seguro de la imagen */}
+  {imageTarget?.url ? (
+    <Picture 
+      src={imageTarget.url}
+      alt={`Imagen del Post: ${post.title.rendered}`}
+      width={imageTarget.width}
+      height={imageTarget.height}
+      formats={['avif', 'webp']}
+      class="w-full h-64 object-cover rounded-2xl shadow-sm"
+    />
+  ) : (
+    <div class="bg-zinc-100 rounded-2xl w-full h-64 flex items-center justify-center text-zinc-400 text-sm border border-zinc-200">
+      Sin imagen destacada
+    </div>
+  )}
+
+</article>
