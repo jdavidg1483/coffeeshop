@@ -20,6 +20,7 @@ const featuredImagesSchema = z.object({
 
 export const BaseWPSchema = z.object({
   id: z.number(),
+  slug: z.string(),
   
   title: z.object({
     rendered: z.string()

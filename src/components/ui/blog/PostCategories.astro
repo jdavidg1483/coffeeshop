@@ -1,0 +1,15 @@
+---
+interface Props {
+    name: string
+    slug: string // 👈 ¡AGREGADO! Necesitamos el slug para armar la URL del enlace
+}
+
+const { name, slug } = Astro.props // 👈 CORREGIDO: Extraemos "slug" de las props
+---
+
+<a
+  href={`/categorias/${slug}`} // 👈 CORREGIDO: Ahora usamos la variable "slug" que sí existe aquí
+  class="text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-900 px-2.5 py-1 rounded-full hover:bg-amber-200 transition-colors"
+>
+  {name}
+</a>

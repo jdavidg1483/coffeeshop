@@ -1,0 +1,86 @@
+---
+import { Picture } from 'astro:assets'
+import Layout from "@/layouts/Layout.astro"
+import PostMeta from "@/components/ui/blog/PostMeta.astro"
+// Descoméntalo si vas a usar tu componente modular:
+// import PostCategories from "@/components/ui/blog/PostCategories.astro"
+import { PostSchema } from "@/types"
+
+export const prerender = false
+
+const { slug } = Astro.params
+
+// 1. CORREGIDO: URL protegida con PUBLIC_
+const res = await fetch(`${import.meta.env.API_URL}/posts?slug=${slug}`) 
+const json = await res.json()
+
+if (!json || json.length === 0) {
+  return Astro.redirect('/404')
+}
+
+// 2. USO PERFECTO DE SAFEPARSE: Si el esquema cambia o falla, al 404 de forma segura
+const validation = PostSchema.safeParse(json[0])
+if (!validation.success) {
+  console.error("Error de validación Zod:", validation.error) // Te ayuda a debuggear en consola
+  return Astro.redirect('/404')
+}
+
+// Extraemos los datos validados con éxito
+const { title, featured_images, date, category_details, content } = validation.data
+
+// Estrategia de respaldo (Fallback) para la imagen destacada
+const imageTarget = featured_images?.full || featured_images?.large || featured_images?.medium;
+---
+
+<Layout 
+  title={title.rendered}
+  subtitle={title.rendered}
+  // 3. CORREGIDO: Acceso seguro al fondo por si viene sin foto
+  bgImage={imageTarget?.url}
+>
+  <article class="max-w-4xl mx-auto py-10 space-y-8">
+    
+    {/* 4. CORREGIDO: Usamos la variable directa desestructurada */}
+    <PostMeta date={date} /> 
+
+    {/* Renderizado de categorías */}
+    {category_details && category_details.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {category_details.map(cat => (
+          <a 
+            href={`/categorias/${cat.slug}`} 
+            class="text-sm font-bold uppercase tracking-wider bg-amber-100 text-amber-900 px-3 py-1 rounded-full hover:bg-amber-200 transition-colors"
+          >
+            {cat.name}
+          </a>
+          // O si usas tu componente: <PostCategories name={cat.name} slug={cat.slug} />
+        ))}
+      </div>
+    )}
+
+    {/* 5. CORREGIDO: Renderizado e inyección segura de la imagen */}
+    <div class="w-full">
+      {imageTarget?.url ? (
+        <Picture 
+          src={imageTarget.url}
+          alt={`Imagen del Post: ${title.rendered}`}
+          width={imageTarget.width}
+          height={imageTarget.height}
+          formats={['avif', 'webp']}
+          class="w-full h-80 object-cover rounded-2xl shadow-sm"
+        />
+      ) : (
+        <div class="bg-zinc-100 rounded-2xl w-full h-64 flex items-center justify-center text-zinc-400 text-sm border border-zinc-200">
+          Sin imagen destacada
+        </div>
+      )}
+    </div>
+
+    {/* Contenido completo del post inyectado limpiamente con Tailwind Typography */}
+    <div 
+      class="prose prose-xl max-w-none text-zinc-700 prose-headings:text-coffee-900 prose-a:text-coffee-600 prose-img:rounded-2xl" 
+      set:html={content.rendered}
+    ></div>
+
+  </article>
+</Layout>
