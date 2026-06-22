@@ -1,23 +1,23 @@
 import { z } from 'astro:content'
 
-// 1. CORREGIDO: Se cambia 'with' por 'width'
+// 1. Esquema base para imágenes individuales
 const imageSchema = z.object({
   url: z.string().url(),
   width: z.number(),
   height: z.number()
 })
 
-// 2. OPTIMIZACIÓN: Usamos .partial() para que si WordPress no generó 
-// el tamaño 'large' (porque la imagen era chica), el esquema no rompa la web.
+// 2. Tamaños de imágenes de WordPress de forma segura
 const featuredImagesSchema = z.object({
   thumbnail: imageSchema,
   medium: imageSchema,
-  "medium-large": imageSchema.optional(), // Por si viene con guion medio en tu JSON
-  medium_large: imageSchema.optional(),   // Por si viene con guion bajo
+  "medium-large": imageSchema.optional(), 
+  medium_large: imageSchema.optional(),   
   large: imageSchema.optional(),
   full: imageSchema
-}).partial() // Hace que todos los tamaños internos sean opcionales por seguridad, excepto los que decidas
+}).partial() 
 
+// 3. Esquema Base para las respuestas de WordPress
 export const BaseWPSchema = z.object({
   id: z.number(),
   slug: z.string(),
@@ -30,42 +30,54 @@ export const BaseWPSchema = z.object({
     rendered: z.string()
   }),
   
-  // 3. PROTECCIÓN: La imagen destacada puede ser opcional (si una página no tiene foto)
   featured_images: featuredImagesSchema.optional().nullable(),
-
-  acf: z.object({
   
-  })
-
-
+  // Lo dejamos vacío aquí para que .extend() lo sobreescriba correctamente
+  acf: z.object({}).passthrough() 
 })
 
-  const prcessSchema = z.object({
-    title: z.string(),
-    description: z.string(),
-    imagen: z.string()
-  })
+// Corrección de typo: prcessSchema -> processSchema
+const processSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  imagen: z.string().url().or(z.string()) // Por si viene la URL o el ID en texto
+})
 
-  const CategorySchema = z.object({
-     name: z.string(),
-     slug: z.string()
-  })
+export const CategorySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string()
+})
 
-  const CategoriesSchema = z.array(CategorySchema)
+// Esquemas de Categorías
+export const CategoriesSlugSchema = z.array(CategorySchema.pick({
+  slug: true
+}))
+const CategoriesSchema = z.array(CategorySchema)
+// 4. CORREGIDO: Mapeamos explícitamente las propiedades dinámicas de tu ACF
+export const ProcessPageSchema = BaseWPSchema.extend({
+  acf: z.object({
+    subtitle: z.string(),
+    
+    // Definimos explícitamente cada proceso como opcional para que no rompa
+    // si en WordPress solo llenaste 2 o 3 en lugar de los 5.
+    process_1: processSchema.optional(),
+    process_2: processSchema.optional(),
+    process_3: processSchema.optional(),
+    process_4: processSchema.optional(),
+    process_5: processSchema.optional(),
+  }).catchall(z.any()) // Permite cualquier otra propiedad extra de WordPress sin romper
+})
 
-  export const ProcessPageSchema = BaseWPSchema.extend({
-    acf: z.object({
-      subtitle: z.string()
-    }).catchall(prcessSchema)
-  })
+// 5. Esquema de Entradas (Posts) y exportaciones se quedan igual
+export const PostSchema = BaseWPSchema.omit({
+  acf: true
+}).extend({
+  date: z.string(),
+  category_details: CategoriesSchema
+})
 
-  export const PostSchema =  BaseWPSchema.omit({
-    acf:true
-  }).extend({
-    date: z.string(),
-    category_details: CategoriesSchema
-  })
+export const PostsSchema = z.array(PostSchema)
 
-  export const PostsSchema = z.array(PostSchema)
-
-  export type Post = z.infer<typeof PostSchema>
+export type Post = z.infer<typeof PostSchema>
+export type ProcessPage = z.infer<typeof ProcessPageSchema>

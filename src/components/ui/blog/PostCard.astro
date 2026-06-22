@@ -34,7 +34,7 @@ const categories = post.category_details || [];
     {/* 3. Mapeo limpio usando tu componente modular de Categorías */}
     {categories.length > 0 && (
       <div class="flex flex-wrap gap-2">
-        {categories.map(cat => <PostCategories name={cat.name} />)}
+        {categories.map(cat => <PostCategories name={cat.name} slug={cat.slug} />)}
       </div>
     )}
     

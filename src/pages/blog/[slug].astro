@@ -34,8 +34,7 @@ const imageTarget = featured_images?.full || featured_images?.large || featured_
 
 <Layout 
   title={title.rendered}
-  subtitle={title.rendered}
-  // 3. CORREGIDO: Acceso seguro al fondo por si viene sin foto
+
   bgImage={imageTarget?.url}
 >
   <article class="max-w-4xl mx-auto py-10 space-y-8">
@@ -48,10 +47,10 @@ const imageTarget = featured_images?.full || featured_images?.large || featured_
       <div class="flex flex-wrap gap-2">
         {category_details.map(cat => (
           <a 
-            href={`/categorias/${cat.slug}`} 
+            href={`/blog/categoria/${cat.slug}`} 
             class="text-sm font-bold uppercase tracking-wider bg-amber-100 text-amber-900 px-3 py-1 rounded-full hover:bg-amber-200 transition-colors"
           >
-            {cat.name}
+            {cat.name} slug={cat.slug}
           </a>
           // O si usas tu componente: <PostCategories name={cat.name} slug={cat.slug} />
         ))}
