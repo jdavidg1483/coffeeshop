@@ -36,6 +36,17 @@ export const BaseWPSchema = z.object({
   acf: z.object({}).passthrough() 
 })
 
+const gallerySchema = z.object({
+  large: imageSchema,
+  full: imageSchema,
+})
+
+
+export const GalleryPageSchema = BaseWPSchema.extend({
+  // 🚀 .default([]) garantiza que 'gallery' siempre sea un array ejecutable en Astro
+  gallery: z.array(gallerySchema).default([])
+})
+
 // Corrección de typo: prcessSchema -> processSchema
 const processSchema = z.object({
   title: z.string(),
@@ -81,3 +92,5 @@ export const PostsSchema = z.array(PostSchema)
 
 export type Post = z.infer<typeof PostSchema>
 export type ProcessPage = z.infer<typeof ProcessPageSchema>
+
+export type Gallery = z.infer<typeof gallerySchema>

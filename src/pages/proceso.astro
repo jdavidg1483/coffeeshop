@@ -1,13 +1,13 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { Picture, inferRemoteSize } from "astro:assets";
-import { ProcessPageSchema } from "@/types"
+import {  ProcessPageSchema} from "@/types"
 
 console.log(import.meta.env.API_URL)
 const url = `${import.meta.env.API_URL}/pages?slug=proceso`;
 const res = await fetch(url);
 const json = await res.json();
-const data = ProcessPageSchema.parse(json[0])
+const data =  ProcessPageSchema.parse(json[0])
 
 const processKeys = Array.from({length: 5}, (_ , i) => `process_${i+1}`)
 console.log(processKeys)
@@ -19,39 +19,41 @@ console.log(processKeys)
    bgImage={data.featured_images.full.url}
 >
 
+
+    
+    
+   
+    
+    
     <div class="text-xl space-y-3 mt-10 lg:mt-0" set:html={data.content.rendered}></div>
   
-    <div class="mt-10 space-y-10 ">
-       {processKeys.map(async (key, i) => {
-          
-          // 1. CONTROL DE DAÑOS: Verificamos si existe la llave en ACF antes de desestructurar
-          const processData = data.acf[key];
-          if (!processData || !processData.imagen) return null; // Si está vacío, ignora este paso
+<div class="mt-10 space-y-10 ">
+   {processKeys.map( async (key, i) => {
 
-          // 2. Ahora que es seguro, extraemos las variables
-          const { title, description, imagen } = processData;
+      const { title, description, imagen } = data.acf[key]
 
-          // 3. Obtenemos el tamaño de la imagen remota de forma segura
-          const { width, height } = await inferRemoteSize(imagen);
+      const { width, height }  = await inferRemoteSize(imagen)
 
-          return (
-             <section class="flex flex-col lg:flex-row lg:items-center gap-10">
-                <div class={`w-full lg:w-1/2 ${i % 2 === 0 ? 'lg:order-1' : 'lg:order-2'}`}>
-                   <Picture 
-                      src={imagen}
-                      alt={`Imagen de ${title || data.title.rendered}`}
-                      width={width}
-                      height={height}
-                      formats={['avif', 'webp']} /* Recomendado para optimizar */
-                   />
-                </div>
-                <div class={`w-full lg:w-1/2 ${i % 2 === 0 ? 'lg:order-2' : 'lg:order-1'}`}>
-                   <h3 class="text-coffee-900 font-black text-4xl pb-10 uppercase">{title}</h3>
-                   <p class="text-lg">{description}</p>
-                </div>
-             </section>
-          )
-       })}
-    </div>
+      
+      return (
+         <section class="flex flex-col lg:flex-row lg:items-center gap-10">
+            <div class={`w-full lg:w-1/2 ${i % 2 === 0 ? 'lg:order-1' : 'lg:order-2'}`}>
+               <Picture 
+                  src={imagen}
+                  alt={`Imagen de ${data.title.rendered}`}
+                  width={width}
+                  height={height}
+               />
+            </div>
+            <div class={`w-full lg:w-1/2 ${i % 2 === 0 ? 'lg:order-2' : 'lg:order-1'}`}>
+            <h3 class="text-coffee-900 font-black text-4xl pb-10 uppercase">{title}</h3>
+            <p class="text-lg">{description}</p>
+
+            </div>
+
+         </section>
+      )
+   })}
+</div>
 
 </Layout>

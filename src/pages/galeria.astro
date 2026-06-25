@@ -1,0 +1,35 @@
+---
+import { GalleryPageSchema } from "@/types"
+import Layout from "../layouts/Layout.astro";
+import GalleryGrid from "@/components/gallery/GalleryGrid.astro";
+
+const url = `${import.meta.env.API_URL}/pages?slug=galeria&_embed`;
+const res = await fetch(url);
+const pages = await res.json();
+
+// Validamos primero que exista la página en el array devuelto por WP antes de parsear
+if (!pages || pages.length === 0) {
+  throw new Error("No se encontró la página 'galeria' en WordPress");
+}
+
+const page = GalleryPageSchema.parse(pages[0])
+
+// Extracción limpia de la imagen destacada
+const featuredMedia = page._embedded?.['wp:featuredmedia']?.[0];
+const imageUrl = featuredMedia?.source_url || featuredMedia?.guid?.rendered || null;
+const imageAlt = featuredMedia?.alt_text || page.title.rendered;
+
+// Extracción segura de ACF
+const subtitulo = page.acf?.subtitle || "Bienvenidos a nuestra cafetería"; 
+---
+
+<Layout 
+  title={page.title.rendered}
+  subtitle={subtitulo}
+  bgImage={imageUrl} 
+>
+
+  {/* 🚀 CORREGIDO: La propiedad 'gallery' debe ir dentro de la etiqueta del componente */}
+  <GalleryGrid gallery={page.gallery} />
+  
+</Layout>
