@@ -1,0 +1,51 @@
+---
+import { Picture } from "astro:assets"
+import Layout from "../layouts/Layout.astro";
+import ProductsMenu from "@/components/menu/ProductsMenu.astro";
+
+// 1. CORREGIDO: Agregamos &_embed al final para traer los datos de la imagen destacada
+// Y usamos PUBLIC_API_URL para que no te dé undefined
+const url = `${import.meta.env.API_URL}/pages?slug=menu&_embed`;
+const res = await fetch(url);
+const pages = await res.json();
+const page = pages[0];
+
+if (!page) {
+  throw new Error("No se encontró la página 'proceso'");
+}
+
+// 2. Extracción limpia de la imagen destacada (¡Ahora sí funcionará porque viene incrustada!)
+const featuredMedia = page._embedded?.['wp:featuredmedia']?.[0];
+const imageUrl = featuredMedia?.source_url || featuredMedia?.guid?.rendered || null;
+const imageAlt = featuredMedia?.alt_text || page.title.rendered;
+
+// 3. Extracción segura de ACF
+const subtitulo = page.acf?.subtitle || "Bienvenidos a nuestra cafetería"; 
+---
+
+<Layout 
+  title={page.title.rendered}
+  subtitle={subtitulo}
+  bgImage={imageUrl} 
+>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+    
+    {imageUrl && (
+      <Picture 
+        src={imageUrl} 
+        alt={imageAlt}
+        width={800} 
+        height={600} 
+        formats={['avif', 'webp']} 
+        class="rounded-lg shadow-md max-w-full h-auto object-cover"
+      />
+    )}
+    
+    <div class="text-xl space-y-3 mt-10 lg:mt-0" set:html={page.content.rendered}></div>
+  </div>
+
+  <ProductsMenu
+    slot='after-main-content'
+   
+  />
+</Layout>

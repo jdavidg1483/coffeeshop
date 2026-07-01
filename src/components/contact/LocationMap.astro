@@ -1,0 +1,52 @@
+---
+import type { Location } from '@/types'
+
+interface Props {
+    location?: Location | null
+}
+
+const { location } = Astro.props
+---
+<div>
+
+    <h3 class="text-coffee-900 font-black text-center text-2xl uppercase mb-5">Ubicacion</h3>
+    <div id="map" class="h-[500px] w-full"></div> <location-data 
+ data-lat={location?.lat ?? 0}
+ data-lng={location?.lng ?? 0}
+ data-zoom={location?.zoom ?? 12}
+ data-label={location?.markers?.[0]?.label ?? 'Ubicación sin nombre'}
+/>
+</div>
+
+
+<script>
+    import L from 'leaflet'
+    import "leaflet/dist/leaflet.css"
+
+    class LocationData extends HTMLElement {
+        connectedCallback() {
+            const lat = parseFloat(this.dataset.lat || '0')
+            const lng = parseFloat(this.dataset.lng || '0')
+            const zoom = parseInt(this.dataset.zoom || '12', 10)
+            const label = this.dataset.label || 'Ubicación'
+            
+            // 💡 Cambiamos la condición: Si lat o lng son 0, no inicializamos para evitar mapas vacíos
+            if (lat !== 0 && lng !== 0) {
+                
+                // 1. CORREGIDO: .setView() toma un array [lat, lng] y el zoom va como segundo argumento SEPARADO, no dentro del array
+                const map = L.map('map').setView([lat, lng], zoom);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+                
+                // 2. CORREGIDO: L.marker() recibe las coordenadas en un array [lat, lng] o un objeto, no como argumentos sueltos
+                L.marker([lat, lng]).addTo(map)
+                    .bindPopup(label)
+                    .openPopup()
+            }
+        }
+    }
+
+    customElements.define('location-data', LocationData)
+</script>
